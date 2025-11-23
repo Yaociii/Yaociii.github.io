@@ -1,0 +1,607 @@
+<!DOCTYPE html> <html lang="zh-CN"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1" /> <title>Yaociii - 个人主页</title> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet" /> <style> /* 基础样式重置 */ * { margin: 0; padding: 0; box-sizing: border-box; } html { scroll-behavior: smooth; } body { font-family: 'Merriweather', serif; background-color: #0a192f; color: #e6f1ff; line-height: 1.6; overflow-x: hidden; } h1,h2,h3,h4,h5,h6 { font-family: 'Inter', sans-serif; font-weight: 600; margin-bottom: 1rem; } p { margin-bottom: 1.2rem; } a { text-decoration: none; color: inherit; transition: all 0.25s ease; } .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+/* 导航栏 */
+    nav {
+        position: fixed; top: 0; left: 0; width: 100%;
+        background-color: rgba(10,25,47,0.95);
+        backdrop-filter: blur(6px);
+        z-index: 1000;
+        padding: 20px 0;
+        transition: padding 0.2s ease, box-shadow 0.2s ease;
+    }
+    .nav-container { display:flex; justify-content:space-between; align-items:center; }
+    .logo { font-family:'Inter', sans-serif; font-weight:700; font-size:1.5rem; color:#64ffda; }
+    .nav-links { display:flex; list-style:none; }
+    .nav-links li { margin-left:28px; }
+    .nav-links a { position:relative; padding:6px 0; font-family:'Inter', sans-serif; font-weight:500; color:#cfe7ff; }
+    .nav-links a::after { content:''; position:absolute; left:0; bottom:0; width:0; height:2px; background:#64ffda; transition:width .25s; }
+    .nav-links a:hover::after { width:100%; }
+
+    /* 英雄区 */
+    #hero { min-height:100vh; display:flex; align-items:center; padding-top:80px; position:relative; overflow:hidden; }
+    .hero-content { max-width:700px; z-index:2; }
+    .hero-content h1 { font-size:3.4rem; color:#e6f1ff; margin-bottom:0.6rem; }
+    .hero-content h2 { font-size:1.6rem; color:#64ffda; margin-bottom:1rem; }
+    .hero-content p { color:#a8b2d1; max-width:640px; margin-bottom:1.6rem; }
+    .hero-buttons { display:flex; gap:16px; }
+    .btn { padding:12px 26px; border-radius:6px; font-family:'Inter',sans-serif; font-weight:600; cursor:pointer; border:none; }
+    .btn-primary { background:#ff6b35; color:#0a192f; }
+    .btn-primary:hover { transform:translateY(-3px); box-shadow:0 10px 20px rgba(255,107,53,0.25); }
+    .btn-secondary { background:transparent; border:1px solid #64ffda; color:#64ffda; }
+    .btn-secondary:hover { background:rgba(100,255,218,0.06); transform:translateY(-3px); }
+    .hero-background {
+        position:absolute; top:0; right:0; width:48%; height:100%;
+        background:linear-gradient(135deg, rgba(100,255,218,0.08), rgba(10,25,47,0) 70%); z-index:1;
+    }
+
+    /* 座右铭 */
+    .motto-container { padding:80px 0; background:#0a192f; }
+    .motto-content { text-align:center; max-width:800px; margin:0 auto; }
+    .motto-text { font-size:2rem; color:#64ffda; font-style:italic; margin-bottom:30px; position:relative; padding:0 20px; }
+    .motto-text::before, .motto-text::after { content:'"'; font-size:3rem; color:#ff6b35; position:absolute; top:-8px; }
+    .motto-text::before { left:0; } .motto-text::after { right:0; }
+    .motto-image { width:100%; max-width:600px; height:300px; margin:0 auto; border-radius:8px; background-image:url('https://puui.qpic.cn/vpic_cover/d0043cv4beb/d0043cv4beb_hz.jpg/496'); background-size:cover; background-position:center; box-shadow:0 6px 20px rgba(0,0,0,0.35); transition:transform .4s ease; }
+    .motto-image:hover { transform:scale(1.03); }
+
+    /* 时间轴 */
+    .timeline-container { padding:100px 0; position:relative; }
+    .timeline-title { text-align:center; font-size:2.4rem; margin-bottom:60px; position:relative; color:#e6f1ff; }
+    .timeline-title::after { content:''; position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:60px; height:3px; background:#64ffda; }
+    /* 关键：使用可被 JS 覆盖的 top 值（避免硬编码） */
+    .timeline-line {
+        position:absolute;
+        left:50%;
+        top: var(--timeline-line-top, 140px);
+        bottom:0;
+        width:4px;
+        background:linear-gradient(to bottom,#64ffda, #233554);
+        transform:translateX(-50%);
+        z-index:1;
+    }
+    .timeline { position:relative; z-index:2; margin-top:40px; }
+    .timeline-item {
+        display:flex; justify-content:flex-end; padding-right:50%; position:relative; margin-bottom:100px;
+        opacity:0; transform:translateY(30px); transition:opacity .6s ease, transform .6s ease;
+    }
+    .timeline-item.visible { opacity:1; transform:translateY(0); }
+    .timeline-item:nth-child(even) { justify-content:flex-start; padding-right:0; padding-left:50%; }
+    .timeline-card { width:90%; max-width:500px; background:#112240; border-radius:8px; padding:26px; box-shadow:0 6px 18px rgba(0,0,0,0.25); transition:transform .25s ease; }
+    .timeline-card:hover { transform:translateY(-6px); }
+    .timeline-indicator { position:absolute; top:50%; right:-10px; width:20px; height:20px; border-radius:50%; background:#64ffda; border:3px solid #0a192f; transform:translateY(-50%); z-index:3; }
+    .timeline-item:nth-child(even) .timeline-indicator { right:auto; left:-10px; }
+    .timeline-period { font-family:'Inter',sans-serif; font-weight:600; color:#64ffda; margin-bottom:6px; font-size:.9rem; }
+    .timeline-card h3 { font-size:1.5rem; color:#e6f1ff; margin-bottom:10px; }
+    .timeline-goal { font-weight:600; color:#a8b2d1; margin-bottom:12px; }
+
+    .timeline-list { list-style:none; margin-bottom:8px; padding-left:0; }
+    .timeline-list li { position:relative; padding-left:20px; margin-bottom:8px; color:#a8b2d1; }
+    .timeline-list li::before { content:'▹'; position:absolute; left:0; color:#64ffda; }
+
+    .status-badge { display:inline-block; padding:4px 12px; border-radius:20px; font-family:'Inter',sans-serif; font-size:.8rem; font-weight:600; margin-bottom:12px; }
+    .status-in-progress { background:rgba(255,107,53,0.08); color:#ff6b35; }
+    .status-planned { background:rgba(168,178,209,0.06); color:#a8b2d1; }
+
+    /* 技能 */
+    .skills-container { padding:100px 0; }
+    .skills-title { text-align:center; font-size:2.4rem; margin-bottom:40px; position:relative; color:#e6f1ff; }
+    .skills-title::after { content:''; position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:60px; height:3px; background:#64ffda; }
+    .skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:24px; max-width:1100px; margin:0 auto 20px; }
+    .skill-category { background:#112240; padding:22px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.18); }
+    .category-title { font-family:'Inter',sans-serif; color:#64ffda; margin-bottom:12px; position:relative; padding-bottom:8px; }
+    .category-title::after { content:''; position:absolute; bottom:0; left:0; width:36px; height:2px; background:#ff6b35; }
+    .skill-item { margin-bottom:16px; }
+    .skill-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .skill-name { font-family:'Inter',sans-serif; color:#e6f1ff; font-weight:500; }
+    .skill-percent { font-family:'Inter',sans-serif; color:#ff6b35; font-weight:700; }
+    .progress-bar { height:10px; background:#233554; border-radius:6px; overflow:hidden; position:relative; }
+    .progress-fill { height:100%; background:#ff6b35; border-radius:6px; transition:width 1s ease-in-out; position:relative; }
+    .progress-fill::after { content:''; position:absolute; top:0; left:0; height:100%; width:100%; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); animation:shimmer 2s linear infinite; }
+    @keyframes shimmer { 0% { transform:translateX(-100%);} 100% { transform:translateX(100%);} }
+
+    .working-message { text-align:center; color:#ff6b35; font-family:'Inter',sans-serif; margin-top:20px; padding-top:16px; border-top:1px solid #233554; }
+
+    /* 我的项目 */
+    .projects-container { padding:80px 0; background:#0a192f; }
+    .projects-title { text-align:center; font-size:2.4rem; margin-bottom:40px; color:#64ffda; position:relative; }
+    .projects-title::after { content:''; position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:60px; height:3px; background:#ff6b35; }
+    .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; max-width:1000px; margin:0 auto 24px; }
+    .project-card { background:#112240; padding:20px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.18); display:flex; flex-direction:column; justify-content:space-between; color:#e6f1ff; text-decoration:none; transition:transform .2s ease; }
+    .project-card:hover { transform:translateY(-6px); box-shadow:0 12px 28px rgba(255,107,53,0.12); }
+    .project-card h3 { color:#64ffda; margin-bottom:8px; }
+    .project-card p { color:#a8b2d1; flex-grow:1; margin-bottom:12px; }
+    .project-link { font-family:'Inter',sans-serif; color:#ff6b35; font-weight:700; align-self:flex-end; }
+    .project-extension { max-width:640px; margin:0 auto; background:#112240; padding:22px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.18); color:#e6f1ff; }
+
+    #project-form { display:flex; flex-direction:column; gap:12px; }
+    #project-form input, #project-form textarea { padding:10px 12px; border-radius:6px; border:none; background:#0b2033; color:#e6f1ff; font-family:'Inter',sans-serif; font-size:0.95rem; }
+    #project-form input::placeholder, #project-form textarea::placeholder { color:#98a6c7; }
+    #project-form input:focus, #project-form textarea:focus { outline:2px solid #ff6b35; background:#122435; }
+
+    /* 联系方式 */
+    .contact-container { padding:100px 0; background:#0a192f; }
+    .contact-title { text-align:center; font-size:2.4rem; margin-bottom:36px; color:#e6f1ff; position:relative; }
+    .contact-title::after { content:''; position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:60px; height:3px; background:#64ffda; }
+    .contact-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; max-width:1000px; margin:0 auto; }
+    .contact-card { background:#112240; padding:30px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.18); text-align:center; color:#e6f1ff; display:block; }
+    .contact-icon { width:64px; height:64px; margin:0 auto 12px; border-radius:50%; background:rgba(100,255,218,0.08); display:flex; align-items:center; justify-content:center; transition:transform .2s ease; }
+    .contact-card:hover .contact-icon { transform:scale(1.05); background:rgba(255,107,53,0.08); }
+    .contact-icon svg { width:30px; height:30px; fill:#64ffda; }
+    .contact-card h3 { margin-bottom:8px; color:#e6f1ff; }
+    .contact-info { color:#a8b2d1; }
+
+    footer { background:#0a192f; border-top:1px solid #233554; padding:26px 0; text-align:center; color:#a8b2d1; font-family:'Inter',sans-serif; }
+
+    /* 悬浮气泡美化（ai助学） */
+    .floating-bubble {
+        position:fixed; bottom:30px; right:30px;
+        width:72px; height:72px; border-radius:50%;
+        background: radial-gradient(circle at 35% 30%, #bffbf0 0%, #64ffda 45%, #43e7b6 100%);
+        display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10000;
+        box-shadow: 0 6px 18px rgba(100,255,218,0.18), 0 0 40px rgba(100,255,218,0.08);
+        transition: transform .25s ease, box-shadow .25s ease;
+        text-decoration:none;
+    }
+    .floating-bubble:hover { transform:scale(1.14); box-shadow: 0 10px 30px rgba(255,107,53,0.18), 0 0 60px rgba(100,255,218,0.2); }
+    .bubble-tooltip {
+        position:absolute; right:88px; top:50%; transform:translateY(-50%) translateX(8px);
+        background:#0f2336; padding:10px 14px; border-radius:8px; color:#e6f1ff; font-weight:700; font-family:'Inter',sans-serif;
+        opacity:0; pointer-events:none; transition:opacity .22s ease, transform .22s ease; white-space:nowrap; box-shadow:0 6px 20px rgba(0,0,0,0.3);
+    }
+    .floating-bubble:hover .bubble-tooltip { opacity:1; transform:translateY(-50%) translateX(0); pointer-events:auto; }
+    .bubble-label {
+        font-family:'Inter',sans-serif; font-weight:900; font-size:14px; color:#06202a; text-align:center; line-height:1;
+        text-transform:none; letter-spacing:0.5px;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+        .nav-links { display:none; }
+        .hero-content h1 { font-size:2.4rem; }
+        .hero-content h2 { font-size:1.25rem; }
+        .hero-buttons { flex-direction:column; }
+        .timeline-line { left:20px; /* top 将由 JS 决定 */ }
+        .timeline-item, .timeline-item:nth-child(even) { justify-content:flex-start; padding-left:50px; padding-right:0; opacity:1; transform:none; }
+        .timeline-indicator { left:10px; right:auto; }
+        .skills-grid, .projects-grid, .contact-grid { grid-template-columns:1fr; }
+        .floating-bubble { width:56px; height:56px; right:18px; bottom:18px; }
+        .bubble-label { font-size:12px; }
+        .bubble-tooltip { right:70px; padding:8px 12px; font-size:13px; }
+    }
+</style>
+</head> <body> <!-- 导航栏 --> <nav> <div class="container nav-container"> <div class="logo">Yaociii</div> <ul class="nav-links"> <li><a href="#hero">首页</a></li> <li><a href="#motto">座右铭</a></li> <li><a href="#timeline">大学规划</a></li> <li><a href="#skills">技能</a></li> <li><a href="#projects">我的项目</a></li> <li><a href="#contact">联系方式</a></li> </ul> </div> </nav>
+    <!-- 英雄区域 -->
+<section id="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>你好，我是Yaociii</h1>
+            <h2>一名充满热情的软件工程学生</h2>
+            <p>我目前是华中科技大学的大一新生，主修软件工程。这里记录我的学习成长、技术探索和项目实践。欢迎来到我的数字世界！</p>
+            <div class="hero-buttons">
+                <a href="#timeline" class="btn btn-primary">查看我的规划</a>
+                <a href="#skills" class="btn btn-secondary">了解我的技能</a>
+            </div>
+        </div>
+    </div>
+    <div class="hero-background" aria-hidden="true"></div>
+</section>
+
+<!-- 座右铭 -->
+<section id="motto" class="motto-container">
+    <div class="container">
+        <div class="motto-content">
+            <h2 class="motto-text">命运这种东西，生来就是要被踏于足下的</h2>
+            <div class="motto-image" role="img" aria-label="座右铭配图"></div>
+        </div>
+    </div>
+</section>
+
+<!-- 时间轴 -->
+<section id="timeline" class="timeline-container">
+    <div class="container">
+        <h2 class="timeline-title">大学四年规划</h2>
+        <div class="timeline-line" aria-hidden="true"></div>
+
+        <div class="timeline">
+            <!-- 大一 -->
+            <div class="timeline-item in-progress">
+                <div class="timeline-card">
+                    <span class="status-badge status-in-progress">进行中</span>
+                    <div class="timeline-period">2025.09 - 2026.06</div>
+                    <h3>大一探索期</h3>
+                    <div class="timeline-goal">目标：夯实基础，开拓视野</div>
+                    <div class="timeline-content">
+                        <h4>技能学习</h4>
+                        <ul class="timeline-list">
+                            <li>C语言程序设计</li>
+                            <li>Python基础与应用</li>
+                            <li>HTML/CSS网页开发</li>
+                            <li>Git版本控制</li>
+                        </ul>
+                        <h4>实践计划</h4>
+                        <ul class="timeline-list">
+                            <li>加入技术社团，参与项目开发</li>
+                            <li>参加编程马拉松，锻炼实战能力</li>
+                            <li>建立个人技术博客，记录学习过程</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-indicator" aria-hidden="true"></div>
+            </div>
+
+            <!-- 大二 -->
+            <div class="timeline-item planned">
+                <div class="timeline-card">
+                    <span class="status-badge status-planned">计划中</span>
+                    <div class="timeline-period">2026.09 - 2027.06</div>
+                    <h3>大二发展期</h3>
+                    <div class="timeline-goal">目标：技能深化，探索方向</div>
+                    <div class="timeline-content">
+                        <h4>技能学习</h4>
+                        <ul class="timeline-list">
+                            <li>Vue/React前端框架</li>
+                            <li>MySQL数据库设计与优化</li>
+                            <li>数据结构与算法</li>
+                            <li>计算机网络原理</li>
+                        </ul>
+                        <h4>实践计划</h4>
+                        <ul class="timeline-list">
+                            <li>开发个人项目，构建作品集</li>
+                            <li>寻找技术实习，积累工作经验</li>
+                            <li>参与开源项目，提升协作能力</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-indicator" aria-hidden="true"></div>
+            </div>
+
+            <!-- 大三 -->
+            <div class="timeline-item planned">
+                <div class="timeline-card">
+                    <span class="status-badge status-planned">计划中</span>
+                    <div class="timeline-period">2027.09 - 2028.06</div>
+                    <h3>大三专精期</h3>
+                    <div class="timeline-goal">目标：专业深化，技术专精</div>
+                    <div class="timeline-content">
+                        <h4>技能学习</h4>
+                        <ul class="timeline-list">
+                            <li>Node.js后端开发</li>
+                            <li>Docker容器化技术</li>
+                            <li>系统设计与架构</li>
+                            <li>人工智能与机器学习基础</li>
+                        </ul>
+                        <h4>实践计划</h4>
+                        <ul class="timeline-list">
+                            <li>参与企业级项目开发</li>
+                            <li>准备技术面试，提升竞争力</li>
+                            <li>参加技术大会，拓展行业视野</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-indicator" aria-hidden="true"></div>
+            </div>
+
+            <!-- 大四 -->
+            <div class="timeline-item planned">
+                <div class="timeline-card">
+                    <span class="status-badge status-planned">计划中</span>
+                    <div class="timeline-period">2028.09 - 2029.06</div>
+                    <h3>大四冲刺期</h3>
+                    <div class="timeline-goal">目标：职业规划，实现转型</div>
+                    <div class="timeline-content">
+                        <h4>技能学习</h4>
+                        <ul class="timeline-list">
+                            <li>分布式系统与微服务</li>
+                            <li>云计算平台应用</li>
+                            <li>项目管理与团队协作</li>
+                            <li>职业发展规划</li>
+                        </ul>
+                        <h4>实践计划</h4>
+                        <ul class="timeline-list">
+                            <li>完成毕业设计，展示学习成果</li>
+                            <li>寻找理想工作，实现职业目标</li>
+                            <li>建立专业人脉，规划长期发展</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-indicator" aria-hidden="true"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 技能 -->
+<section id="skills" class="skills-container">
+    <div class="container">
+        <h2 class="skills-title">我的技能</h2>
+        <div class="skills-grid">
+            <div class="skill-category">
+                <h3 class="category-title">编程语言</h3>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">C语言</span>
+                        <span class="skill-percent">85%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">C++</span>
+                        <span class="skill-percent">50%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Java</span>
+                        <span class="skill-percent">0%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <h3 class="category-title">前端技术</h3>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">HTML/CSS</span>
+                        <span class="skill-percent">20%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Vue.js</span>
+                        <span class="skill-percent">0%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">JavaScript</span>
+                        <span class="skill-percent">15%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:15%"></div></div>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <h3 class="category-title">开发工具</h3>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Git</span>
+                        <span class="skill-percent">75%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">VS Code</span>
+                        <span class="skill-percent">90%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">Linux</span>
+                        <span class="skill-percent">40%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <h3 class="category-title">其他技能</h3>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">数据结构与算法</span>
+                        <span class="skill-percent">30%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:30%"></div></div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">数据库基础</span>
+                        <span class="skill-percent">25%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">软件工程基础</span>
+                        <span class="skill-percent">35%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:35%"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="working-message">正在努力中 ψ(*｀ー´)ψ</div>
+    </div>
+</section>
+
+<!-- 我的项目（置于技能和联系方式之间） -->
+<section id="projects" class="projects-container">
+    <div class="container">
+        <h2 class="projects-title">我的项目</h2>
+        <div class="projects-grid">
+            <a href="https://github.com/Yaociii/EightQueens" target="_blank" class="project-card" rel="noopener noreferrer">
+                <h3>八皇后问题</h3>
+                <p>经典算法问题的回溯解法实现，适合练习搜索与回溯思路。</p>
+                <span class="project-link">查看详情 →</span>
+            </a>
+        </div>
+
+        <div class="project-extension">
+            <h3 style="color:#ff6b35; margin-bottom:12px;">添加新项目</h3>
+            <form id="project-form">
+                <input type="text" id="project-title" placeholder="项目标题" required />
+                <input type="url" id="project-url" placeholder="项目链接 (必须是有效URL)" required />
+                <textarea id="project-desc" placeholder="项目描述（可选）" rows="3"></textarea>
+                <button type="submit" class="btn btn-primary">添加项目</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- 联系方式 -->
+<section id="contact" class="contact-container">
+    <div class="container">
+        <h2 class="contact-title">联系方式</h2>
+        <div class="contact-grid">
+            <a href="mailto:1720018340@qq.com" class="contact-card">
+                <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+                <h3>邮箱</h3>
+                <p class="contact-info">1720018340@qq.com</p>
+            </a>
+
+            <a href="tel:18035521021" class="contact-card">
+                <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
+                <h3>电话</h3>
+                <p class="contact-info">180-3552-1021</p>
+            </a>
+
+            <a href="https://maps.google.com/?q=武汉市洪山区珞喻路1037号" target="_blank" class="contact-card" rel="noopener noreferrer">
+                <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+                <h3>地址</h3>
+                <p class="contact-info">武汉市洪山区珞喻路1037号</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 页脚 -->
+<footer>
+    <div class="container">
+        <p>© 2025 Yaociii 持续更新中。</p>
+    </div>
+</footer>
+
+<!-- 悬浮气泡（文字改为“ai助学”，并居中显示） -->
+<a href="https://appbuilder.baidu.com/s/gpZtp3bv" target="_blank" class="floating-bubble" aria-label="ai助学入口" title="ai助学入口" rel="noopener noreferrer">
+    <div class="bubble-tooltip">ai助学入口</div>
+    <div class="bubble-label">ai助学</div>
+</a>
+
+<script>
+    // 导航栏滚动收缩
+    window.addEventListener('scroll', function () {
+        const nav = document.querySelector('nav');
+        if (window.scrollY > 50) {
+            nav.style.padding = '12px 0';
+            nav.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+        } else {
+            nav.style.padding = '20px 0';
+            nav.style.boxShadow = 'none';
+        }
+    });
+
+    // 平滑锚点滚动（排除外链和空链接）
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const targetId = this.getAttribute('href');
+            if (!targetId || targetId === '#') return;
+            const target = document.querySelector(targetId);
+            if (target) {
+                e.preventDefault();
+                const offset = 80; // 顶部导航高度
+                const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({ top, behavior: 'smooth' });
+            }
+        });
+    });
+
+    // 时间轴进入视口动画 & 进度条动画 & 动态对齐竖线
+    document.addEventListener('DOMContentLoaded', function () {
+        // 时间轴项动画
+        const items = document.querySelectorAll('.timeline-item');
+        const tlObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.12 });
+        items.forEach(it => tlObserver.observe(it));
+
+        // 进度条动画
+        const bars = document.querySelectorAll('.progress-fill');
+        const pbObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const targetWidth = el.getAttribute('data-w') || el.style.width || '0%';
+                    el.style.width = '0%';
+                    setTimeout(() => { el.style.width = targetWidth; }, 80);
+                    pbObserver.unobserve(el);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        bars.forEach(bar => {
+            if (!bar.getAttribute('data-w')) bar.setAttribute('data-w', bar.style.width || '0%');
+            bar.style.width = '0%';
+            pbObserver.observe(bar);
+        });
+
+        // 动态对齐时间轴竖线，使其起始位置与标题下方横线对齐（并在 resize 时保持）
+        const adjustTimelineLine = () => {
+            const timelineContainer = document.querySelector('.timeline-container');
+            if (!timelineContainer) return;
+            const title = timelineContainer.querySelector('.timeline-title');
+            const line = timelineContainer.querySelector('.timeline-line');
+            if (!title || !line) return;
+
+            // 获取标题和容器在视口中的位置，计算相对容器的 top
+            const cRect = timelineContainer.getBoundingClientRect();
+            const tRect = title.getBoundingClientRect();
+
+            // 标题的底部（tRect.bottom）相对于容器 top（cRect.top）
+            // 要对齐到标题下方的横线底部。标题伪元素位置为 bottom:-10px, 高度3px
+            // 因此横线的底部在：titleBottom - 7px（-10 + 3 = -7）
+            const topPx = Math.round(tRect.bottom - cRect.top - 7);
+
+            // 确保 top 不为负数
+            line.style.top = Math.max(0, topPx) + 'px';
+        };
+
+        // 初次调整并在窗口尺寸变化或字体加载后重算
+        adjustTimelineLine();
+        window.addEventListener('resize', adjustTimelineLine);
+        // 有些字体或图片加载完成后布局会微调，使用 load 事件再调整一次
+        window.addEventListener('load', adjustTimelineLine);
+    });
+
+    // 项目添加功能（前端临时）
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('project-form');
+        const grid = document.querySelector('.projects-grid');
+
+        if (form && grid) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('project-title').value.trim();
+                const url = document.getElementById('project-url').value.trim();
+                const desc = document.getElementById('project-desc').value.trim();
+
+                if (!title || !url) {
+                    alert('请填写项目标题和有效链接');
+                    return;
+                }
+
+                const a = document.createElement('a');
+                a.className = 'project-card';
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+
+                const h3 = document.createElement('h3'); h3.textContent = title; a.appendChild(h3);
+                const p = document.createElement('p'); p.textContent = desc || '\u00A0'; a.appendChild(p);
+                const span = document.createElement('span'); span.className = 'project-link'; span.textContent = '查看详情 →'; a.appendChild(span);
+
+                grid.appendChild(a);
+                form.reset();
+            });
+        }
+    });
+</script>
+</body>
+</html>
